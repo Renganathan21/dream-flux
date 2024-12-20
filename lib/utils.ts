@@ -1,4 +1,4 @@
-/* eslint-disable prefer-const */
+
 import { type ClassValue, clsx } from "clsx";
 import qs from "qs";
 import { twMerge } from "tailwind-merge";
@@ -86,22 +86,29 @@ export function removeKeysFromQuery({
 }
 
 // DEBOUNCE
-export const debounce = (
-  func: (...args: unknown[]) => void,
+export const debounce = <T extends unknown[]>(
+  func: (...args: T) => void,
   delay: number
 ) => {
-  let timeoutId: NodeJS.Timeout | null;
-  return (...args: unknown[]) => {
+  let timeoutId: NodeJS.Timeout | null = null;
+  return (...args: T) => {
     if (timeoutId) clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), delay);
   };
 };
 
+
 // GET IMAGE SIZE
 export type AspectRatioKey = keyof typeof aspectRatioOptions;
+type ImageData = {
+  aspectRatio?: string;
+  width?: number;
+  height?: number;
+};
+
 export const getImageSize = (
   type: string,
-  image: { aspectRatio?: AspectRatioKey; width?: number; height?: number },
+  image: ImageData,
   dimension: "width" | "height"
 ): number => {
   if (type === "fill") {
@@ -112,6 +119,7 @@ export const getImageSize = (
   }
   return image?.[dimension] || 1000;
 };
+
 
 // DOWNLOAD IMAGE
 export const download = (url: string, filename: string) => {
@@ -143,10 +151,10 @@ export const deepMergeObjects = (
     return obj1;
   }
 
-  const output: Record<string, unknown> = { ...obj2 };
+  const output = { ...obj2 };
 
   for (const key in obj1) {
-    if (Object.prototype.hasOwnProperty.call(obj1, key)) {
+    if (obj1.hasOwnProperty(key)) {
       if (
         obj1[key] &&
         typeof obj1[key] === "object" &&
@@ -165,3 +173,5 @@ export const deepMergeObjects = (
 
   return output;
 };
+
+
